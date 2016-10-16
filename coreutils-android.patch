@@ -1,24 +1,32 @@
 diff -ru configure configure
---- configure	2013-12-13 15:05:30.000000000 +0000
-+++ configure	2014-07-09 06:56:14.390000000 +0100
-@@ -40077,11 +40077,11 @@
+--- configure 2013-12-13 16:05:30.000000000 +0100
++++ ./configure 2014-02-12 18:21:28.000000000 +0100
+@@ -39537,7 +39537,7 @@
+ 
+ 
+ # Determine how to get the list of mounted file systems.
+-ac_list_mounted_fs=
++ac_list_mounted_fs=found
+ 
+ # If the getmntent function is available but not in the standard library,
+ # make sure LIBS contains the appropriate -l option.
+@@ -40077,12 +40077,6 @@
    esac
  fi
  
 -if test -z "$ac_list_mounted_fs"; then
 -  as_fn_error $? "could not determine how to read list of mounted file systems" "$LINENO" 5
-+#if test -z "$ac_list_mounted_fs"; then
-+  # as_fn_error $? "could not determine how to read list of mounted file systems" "$LINENO" 5
-   # FIXME -- no need to abort building the whole package
-   # Can't build mountlist.c or anything that needs its functions
+-  # FIXME -- no need to abort building the whole package
+-  # Can't build mountlist.c or anything that needs its functions
 -fi
-+#fi
- 
+-
  if test $ac_list_mounted_fs = found; then :
    gl_cv_list_mounted_fs=yes
+ else
+
 diff -ru lib/fts.c lib/fts.c
---- lib/fts.c	2013-12-04 14:53:33.000000000 +0000
-+++ lib/fts.c	2014-07-09 06:58:10.030000000 +0100
+--- lib/fts.c 2013-12-04 14:53:33.000000000 +0000
++++ lib/fts.c 2014-07-09 06:58:10.030000000 +0100
 @@ -377,7 +377,7 @@
  }
  
@@ -29,8 +37,8 @@ diff -ru lib/fts.c lib/fts.c
            int (*compar) (FTSENT const **, FTSENT const **))
  {
 diff -ru lib/xfts.c lib/xfts.c
---- lib/xfts.c	2013-12-04 14:48:30.000000000 +0000
-+++ lib/xfts.c	2014-07-09 06:58:01.970000000 +0100
+--- lib/xfts.c  2013-12-04 14:48:30.000000000 +0000
++++ lib/xfts.c  2014-07-09 06:58:01.970000000 +0100
 @@ -27,13 +27,13 @@
  #include "xalloc.h"
  #include "xfts.h"
@@ -48,20 +56,23 @@ diff -ru lib/xfts.c lib/xfts.c
      {
        /* This can fail in two ways: out of memory or with errno==EINVAL,
 diff -ru src/dd.c src/dd.c
---- src/dd.c	2013-12-04 14:48:30.000000000 +0000
-+++ src/dd.c	2014-07-09 06:57:04.280000000 +0100
-@@ -1551,7 +1551,7 @@
+--- src/dd.c  2013-12-04 14:48:30.000000000 +0000
++++ src/dd.c  2014-07-09 06:57:04.280000000 +0100
+@@ -1551,7 +1551,11 @@
  
  #ifdef __linux__
  
--# include <sys/mtio.h>
++#ifdef __ANDROID__
 +# include <linux/mtio.h>
++#else
+ # include <sys/mtio.h>
++#endif
  
  # define MT_SAME_POSITION(P, Q) \
     ((P).mt_resid == (Q).mt_resid \
 diff -ru src/du.c src/du.c
---- src/du.c	2013-12-04 14:48:30.000000000 +0000
-+++ src/du.c	2014-07-09 06:57:33.110000000 +0100
+--- src/du.c  2013-12-04 14:48:30.000000000 +0000
++++ src/du.c  2014-07-09 06:57:33.110000000 +0100
 @@ -61,6 +61,8 @@
  # define FTS_CROSS_CHECK(Fts)
  #endif
@@ -72,8 +83,8 @@ diff -ru src/du.c src/du.c
     whose sizes have already been counted.  */
  static struct di_set *di_files;
 diff -ru src/ls.c src/ls.c
---- src/ls.c	2013-12-04 14:48:30.000000000 +0000
-+++ src/ls.c	2014-07-09 07:00:49.650000000 +0100
+--- src/ls.c  2013-12-04 14:48:30.000000000 +0000
++++ src/ls.c  2014-07-09 07:00:49.650000000 +0100
 @@ -2097,12 +2097,13 @@
                  }
              }
@@ -90,8 +101,8 @@ diff -ru src/ls.c src/ls.c
  
    return optind;
 diff -ru src/pinky.c src/pinky.c
---- src/pinky.c	2013-12-04 14:48:30.000000000 +0000
-+++ src/pinky.c	2014-07-09 06:56:46.750000000 +0100
+--- src/pinky.c 2013-12-04 14:48:30.000000000 +0000
++++ src/pinky.c 2014-07-09 06:56:46.750000000 +0100
 @@ -242,13 +242,13 @@
          printf (" %19s", _("        ???"));
        else
@@ -125,8 +136,8 @@ diff -ru src/pinky.c src/pinky.c
        free (result);
      }
 diff -ru src/stat.c src/stat.c
---- src/stat.c	2013-12-13 14:12:46.000000000 +0000
-+++ src/stat.c	2014-07-09 06:57:51.290000000 +0100
+--- src/stat.c  2013-12-13 14:12:46.000000000 +0000
++++ src/stat.c  2014-07-09 06:57:51.290000000 +0100
 @@ -73,6 +73,8 @@
  #include "find-mount-point.h"
  #include "xvasprintf.h"
@@ -136,3 +147,49 @@ diff -ru src/stat.c src/stat.c
  #if USE_STATVFS
  # define STRUCT_STATVFS struct statvfs
  # define STRUCT_STATXFS_F_FSID_IS_INTEGER STRUCT_STATVFS_F_FSID_IS_INTEGER
+
+diff -u -r src/nohup.c src/nohup.c
+--- src/nohup.c  2014-07-11 07:00:07.000000000 -0400
++++ src/nohup.c 2014-12-14 15:22:47.939242789 -0500
+@@ -141,7 +141,7 @@
+       char const *file = "nohup.out";
+       int flags = O_CREAT | O_WRONLY | O_APPEND;
+       mode_t mode = S_IRUSR | S_IWUSR;
+-      mode_t umask_value = umask (~mode);
++      mode_t umask_value = umask (0777 & ~mode);
+       out_fd = (redirecting_stdout
+                 ? fd_reopen (STDOUT_FILENO, file, flags, mode)
+                 : open (file, flags, mode));
+diff -u -r src/pwd.c src/pwd.c
+--- src/pwd.c 2014-07-13 18:09:52.000000000 -0400
++++ src/pwd.c 2015-05-17 19:58:20.692454980 -0400
+@@ -366,7 +366,7 @@
+   if (optind < argc)
+     error (0, 0, _("ignoring non-option arguments"));
+ 
+-  if (logical)
++  if (true) /* Termux: Always try logical, to avoid permission denied on /data/data */
+     {
+       wd = logical_getcwd ();
+       if (wd)
+diff -u -r src/shred.c src/shred.c
+--- src/shred.c 2014-07-11 13:00:07.000000000 +0200
++++ src/shred.c 2014-07-29 15:26:23.000000000 +0200
+@@ -80,7 +80,7 @@
+ #include <assert.h>
+ #include <setjmp.h>
+ #include <sys/types.h>
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ # include <sys/mtio.h>
+ #endif
+ 
+@@ -388,7 +388,7 @@
+ {
+   if (S_ISCHR (st->st_mode))
+     {
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+       /* In the Linux kernel, lseek does not work on tape devices; it
+          returns a randomish value instead.  Try the low-level tape
+          rewind operation first.  */

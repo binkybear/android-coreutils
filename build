@@ -13,8 +13,8 @@ export TARGET=/target
 cd $HOME/droid/bin && git pull https://github.com/sonelli/android-ports-tools.git master
 
 # Download the latest version of coreutils
-if [ ! -f ~/coreutils-8.22.tar.xz ]; then
-    wget -O ~/coreutils-8.22.tar.xz http://ftp.gnu.org/gnu/coreutils/coreutils-8.22.tar.xz
+if [ ! -f ~/coreutils-8.25.tar.xz ]; then
+    wget -O ~/coreutils-8.25.tar.xz http://ftp.gnu.org/gnu/coreutils/coreutils-8.25.tar.xz
 fi
 
 for ARCH_NAME in x86 arm mips; do
@@ -24,9 +24,9 @@ for ARCH_NAME in x86 arm mips; do
 
         # Start each build with a fresh source copy
         cd ~
-        rm -rf ~/coreutils-8.22
-        tar xvf ~/coreutils-8.22.tar.xz
-        cd ~/coreutils-8.22
+        rm -rf ~/coreutils-8.25
+        tar xvf ~/coreutils-8.25.tar.xz
+        cd ~/coreutils-8.25
 
         patch -p0 < ~/coreutils-android.patch
 
@@ -60,7 +60,7 @@ for ARCH_NAME in x86 arm mips; do
 
 
         export FORCE_UNSAFE_CONFIGURE=1
-        ./configure --host=$HOST --with-gnu-ld=ald
+        ./configure --host=$HOST --with-gnu-ld=ald ac_cv_func_mkfifo=yes gl_cv_host_operating_system=Android --without-gmp --enable-single-binary=symlinks ac_cv_func_endpwent=no
         
         echo "#define HAVE_MKFIFO 1" >> lib/config.h
         sed -i 's/^MANS = .*//g' Makefile
@@ -69,11 +69,12 @@ for ARCH_NAME in x86 arm mips; do
 
         for MODULE in $(cat ~/modules); do
             echo "Processing $MODULE"
-            astrip src/$MODULE
+            astrip src/$MODULE || true
             mkdir -p $TARGET/$ARCH_NAME/$BIN_TYPE
-            cp src/$MODULE $TARGET/$ARCH_NAME/$BIN_TYPE/$MODULE
+            cp src/$MODULE $TARGET/$ARCH_NAME/$BIN_TYPE/$MODULE || true
         done
 
-    done
+        tar -cvf $TARGET/android-coreutils-$ARCH_NAME-$BIN_TYPE.tar $TARGET/$ARCH_NAME/$BIN_TYPE/*
 
+    done
 done
