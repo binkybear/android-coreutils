@@ -10,7 +10,7 @@ export ANDROID_NDK=~/droid/android-ndk
 export TARGET=/target
 
 # Update from our repo
-cd $HOME/droid/bin && git pull https://github.com/sonelli/android-ports-tools.git master
+cd $HOME/droid/bin && git pull git://github.com/ddrown/android-ports-tools master
 
 # Download the latest version of coreutils
 if [ ! -f ~/coreutils-8.25.tar.xz ]; then
@@ -65,7 +65,7 @@ for ARCH_NAME in x86 arm mips; do
         echo "#define HAVE_MKFIFO 1" >> lib/config.h
         sed -i 's/^MANS = .*//g' Makefile
 
-        make
+        make -j$(nproc)
 
         for MODULE in $(cat ~/modules); do
             echo "Processing $MODULE"
