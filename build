@@ -65,7 +65,7 @@ for ARCH_NAME in x86 arm mips; do
         echo "#define HAVE_MKFIFO 1" >> lib/config.h
         sed -i 's/^MANS = .*//g' Makefile
 
-        make
+        make -j$(nproc)
 
         for MODULE in $(cat ~/modules); do
             echo "Processing $MODULE"
